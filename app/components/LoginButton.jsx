@@ -9,7 +9,7 @@ const LoginButton = () => {
   if (session) {
     return (
       <>
-        <UserInformation data={session.user.Bearer} />
+        <UserInformation data={session.accessToken} />
         <button onClick={() => signOut()}>Sign Out</button>
       </>
     );

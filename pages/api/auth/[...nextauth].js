@@ -18,7 +18,7 @@ export const authOptions = {
       async authorize(credentials, req) {
         const { username, password } = credentials;
 
-        const accessToken = axios
+        const data = axios
           .post(
             'https://localhost:7131/api/login',
             {},
@@ -30,16 +30,14 @@ export const authOptions = {
             }
           )
           .then((res) => {
-            console.log(res);
             return res.data;
           })
           .catch((err) => {
-            console.log(err.response);
             throw new Error(err.message);
           });
 
-        if (accessToken) {
-          return accessToken;
+        if (data) {
+          return data;
         } else return null;
       }
     })
@@ -51,12 +49,18 @@ export const authOptions = {
     jwt: true
   },
   callbacks: {
-    jwt: async (token, user) => {
-      if (user) {
-        token.accessToken = user.token;
-        console.log(token);
+    jwt: async ({ token, user, account }) => {
+      if (account && user) {
+        return { accessToken: user.token, isAdmin: user.isAdmin };
       }
-      return Promise.resolve(token);
+      return token;
+    },
+    session: async ({ session, token }) => {
+      return {
+        ...session,
+        accessToken: token.accessToken,
+        isAdmin: token.isAdmin
+      };
     }
   }
 };
